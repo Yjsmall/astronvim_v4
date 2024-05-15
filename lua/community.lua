@@ -5,11 +5,12 @@
 ---@type LazySpec
 return {
   "AstroNvim/astrocommunity",
+  -- Language packages
   { import = "astrocommunity.pack.lua" },
-  { import = "astrocommunity.pack.go" },
   { import = "astrocommunity.pack.rust" },
   { import = "astrocommunity.pack.cpp" },
   { import = "astrocommunity.pack.python" },
+  -- { import = "astrocommunity.pack.go" },
   -- import/override with your plugins folder
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.completion.cmp-cmdline" },
