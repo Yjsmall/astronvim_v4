@@ -14,4 +14,5 @@ return {
   -- import/override with your plugins folder
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.completion.cmp-cmdline" },
+  { import = "astrocommunity.colorscheme.oxocarbon-nvim" },
 }
