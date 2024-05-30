@@ -36,6 +36,11 @@ return {
       --   return true
       -- end
     },
+    capabilities = {
+      workspace = {
+        didChangeWatchedFiles = { dynamicRegistration = true },
+      },
+    },
     -- enable servers that you already have installed without mason
     servers = {
       -- "pyright"
