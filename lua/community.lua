@@ -15,4 +15,5 @@ return {
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.completion.cmp-cmdline" },
   { import = "astrocommunity.colorscheme.oxocarbon-nvim" },
+  { import = "astrocommunity.recipes.telescope-nvchad-theme" },
 }

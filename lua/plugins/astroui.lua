@@ -8,7 +8,7 @@ return {
     "AstroNvim/astroui",
     ---@type AstroUIOpts
     opts = {
-      colorscheme = "catppuccin-mocha",
+      colorscheme = "oxocarbon",
       highlights = {
         init = function()
           local get_hlgroup = require("astroui").get_hlgroup
@@ -19,6 +19,15 @@ return {
             OctoEditable = { fg = "NONE", bg = "NONE" }, -- use treesitter for octo.nvim highlighting
           }
         end,
+      },
+      separators = {
+        none = { "", "" },
+        left = { "", "  " },
+        right = { "  ", "" },
+        center = { "  ", "  " },
+        tab = { "", "" },
+        breadcrumbs = "  ",
+        path = "  ",
       },
     },
   },
