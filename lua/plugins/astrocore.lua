@@ -74,5 +74,55 @@ return {
         -- ["<esc>"] = false,
       },
     },
+    autocmds = {
+      RunProg = {
+        {
+          event = "FileType",
+          pattern = "c",
+          callback = function()
+            -- 绑定 <C-R> 键来编译和运行当前的 .c 文件
+            vim.api.nvim_buf_set_keymap(0, "n", "<C-R>", "", {
+              noremap = true,
+              silent = true,
+              callback = function()
+                -- 获取当前文件名和输出文件名
+                local filename = vim.fn.expand "%:p"
+                local output = vim.fn.expand "%:r"
+
+                -- 打开一个新的终端窗口
+                vim.cmd "belowright split | resize 10 | terminal"
+
+                -- 编译命令
+                local compile_cmd = string.format("gcc %s -o %s", filename, output)
+
+                -- 发送编译命令到终端
+                vim.fn.chansend(vim.b.terminal_job_id, compile_cmd .. "\n")
+
+                -- 发送运行命令到终端，如果编译成功
+                local run_cmd =
+                  string.format("if [ $? -eq 0 ]; then ./%s; else echo 'Compilation failed'; fi\n", output)
+                vim.fn.chansend(vim.b.terminal_job_id, run_cmd)
+
+                -- 切换回编辑窗口
+                vim.cmd "wincmd p"
+              end,
+            })
+          end,
+        },
+        {
+          event = "FileType",
+          pattern = "cpp",
+          callback = function()
+            vim.api.nvim_buf_set_keymap(
+              0,
+              "n",
+              "<C-R>",
+              ":w<CR>:!g++ % -o %< && ./%<<CR>",
+              { noremap = true, silent = true }
+            )
+          end,
+        },
+      },
+    },
   },
 }
