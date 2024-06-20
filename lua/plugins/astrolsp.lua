@@ -46,7 +46,30 @@ return {
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
     config = {
-      -- clangd = { capabilities = { offsetEncoding = "utf-8" } },
+      clangd = {
+        capabilities = { offsetEncoding = "utf-8" },
+        cmd = {
+          "clangd",
+          "--all-scopes-completion", -- 全局补全(补全建议会给出在当前作用域不可见的索引,插入后自动补充作用域标识符),例如在main()中直接写cout,即使没有`#include <iostream>`,也会给出`std::cout`的建议,配合"--header-insertion=iwyu",还可自动插入缺失的头文件
+          "--background-index", -- 后台分析并保存索引文件
+          "--clang-tidy", -- 启用 Clang-Tidy 以提供「静态检查」
+          "--compile-commands-dir=${workspaceFolder}/build", -- 编译数据库(compile_commands.json 文件)的目录位置
+          "--completion-parse=auto", -- 当 clangd 准备就绪时，用它来分析建议
+          "--completion-style=detailed", -- 建议风格：打包(重载函数只会给出一个建议);还可以设置为 detailed
+          -- 启用配置文件(YAML格式)
+          "--enable-config",
+          "--fallback-style=Webkit", -- 默认格式化风格: 在没找到 .clang-format 文件时采用,可用的有 LLVM, Google, Chromium, Mozilla, Webkit, Microsoft, GNU
+          "--function-arg-placeholders=true", -- 补全函数时，将会给参数提供占位符，键入后按 Tab 可以切换到下一占位符，乃至函数末
+          "--header-insertion-decorators", -- 输入建议中，已包含头文件的项与还未包含头文件的项会以圆点加以区分
+          "--header-insertion=iwyu", -- 插入建议时自动引入头文件 iwyu
+          "--log=verbose", -- 让 Clangd 生成更详细的日志
+          "--pch-storage=memory", -- pch 优化的位置(Memory 或 Disk,前者会增加内存开销，但会提升性能)
+          "--pretty", -- 输出的 JSON 文件更美观
+          "--ranking-model=decision_forest", -- 建议的排序方案：hueristics (启发式), decision_forest (决策树)
+          "-j=12", -- 同时开启的任务数量
+        },
+        single_file_support = true,
+      },
     },
     -- customize how language servers are attached
     handlers = {
