@@ -3,13 +3,26 @@ local function has_words_before()
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
 end
 
+-- 新增函数: 检查光标前是否有需要跳出的符号
+local function is_before_closing_pair()
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local current_char = vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col + 1, col + 1)
+  return current_char:match "[\"'%)%]%}%>]" ~= nil
+end
+
 local function mapping(is_cmdline)
   if is_cmdline == nil then is_cmdline = false end
   local cmp = require "cmp"
   local luasnip = require "luasnip"
 
   return {
-    ["<CR>"] = cmp.config.disable,
+    ["<CR>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.confirm { select = true }
+      else
+        fallback()
+      end
+    end, { "i", "c" }),
     -- ctrl + e close cmp window
     -- <C-n> and <C-p> for navigating snippets
     ["<C-N>"] = cmp.mapping(function()
@@ -36,6 +49,8 @@ local function mapping(is_cmdline)
       else
         if cmp.visible() and has_words_before() then
           cmp.confirm { select = true }
+        elseif is_before_closing_pair() then
+          vim.api.nvim_win_set_cursor(0, { vim.fn.line ".", vim.fn.col "." + 1 })
         else
           fallback()
         end
