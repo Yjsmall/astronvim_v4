@@ -3,11 +3,21 @@ local function has_words_before()
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
 end
 
--- 新增函数: 检查光标前是否有需要跳出的符号
-local function is_before_closing_pair()
+-- 新增函数: 检查光标前是否有需要跳出的符号，并逐个跳过
+local function jump_over_closing_pairs()
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
   local current_char = vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col + 1, col + 1)
-  return current_char:match "[\"'%)%]%}%>]" ~= nil
+
+  -- 符号集，包含需要跳过的闭合符号
+  local closing_symbols = { '"', "'", ")", "]", "}", ">" }
+
+  -- 检查当前字符是否在符号集中
+  if vim.tbl_contains(closing_symbols, current_char) then
+    vim.api.nvim_win_set_cursor(0, { line, col + 1 }) -- 光标向前移动一位
+    return true
+  end
+
+  return false
 end
 
 local function mapping(is_cmdline)
@@ -49,8 +59,7 @@ local function mapping(is_cmdline)
       else
         if cmp.visible() and has_words_before() then
           cmp.confirm { select = true }
-        elseif is_before_closing_pair() then
-          vim.api.nvim_win_set_cursor(0, { vim.fn.line ".", vim.fn.col "." + 1 })
+        elseif jump_over_closing_pairs() then
         else
           fallback()
         end
